@@ -1,6 +1,21 @@
+# Mac System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might be created if you use a USB drive or Network share
+.Spotlight-V100
+.Trashes
+
 # Environment variables
 .env
 
 # Python
 __pycache__/
 *.pyc
+
+# Flask
+.webassets-cache

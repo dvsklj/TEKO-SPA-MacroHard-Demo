@@ -1,8 +1,8 @@
-# MacroHard - Security Analysis Platform
+# MacroHard - Security Analysis Platform DEMO
 
 **Hardening your Stack on a Macro Level**
 
-MacroHard is a production-ready security analysis platform for software development projects. It automatically analyzes code for security vulnerabilities, tracks findings, and provides actionable insights.
+MacroHard is a security analysis platform for software development projects. It automatically analyzes code for security vulnerabilities, tracks findings, and provides actionable insights. This is a rapidly prototyped demo for my TEKO SPA class and is NOT production ready. 
 
 ## Features
 
@@ -25,7 +25,7 @@ MacroHard is a production-ready security analysis platform for software developm
 
 ## Quick Start with Docker
 
-### Option 1: Demo Mode (Recommended for First Try)
+### Option 1: Demo Mode
 
 The demo mode comes pre-populated with sample projects and vulnerabilities:
 
@@ -50,7 +50,7 @@ open http://localhost:5000
 
 The demo includes 4 sample projects with realistic security vulnerabilities.
 
-### Option 2: Production Mode
+### Option 2: Production Mode -> Can be tested, but not to be used in production.
 
 ```bash
 # Generate secure keys
@@ -71,14 +71,12 @@ open http://localhost:5000
 - Email: `admin@macrohard.local`
 - Password: `ChangeMe123!`
 
-**IMPORTANT:** Change the default admin password immediately after first login!
-
 ## Analyzing Real Code
 
 ### 1. Create a Project
 1. Sign in to MacroHard
 2. Click "New Project"
-3. Enter project name and GitHub/GitLab repository URL
+3. Enter project name and GitHub/GitLab repository URL (only public repos at the moment)
 4. Click "Create Project"
 
 ### 2. Run Analysis
@@ -122,7 +120,6 @@ Click "Export" to download findings as CSV for reporting.
 ```
 macrohard/
 ├── app/
-│   ├── __init__.py          # Application factory with demo seeding
 │   ├── models.py            # Database models with encryption
 │   ├── auth.py              # Authentication routes
 │   ├── main.py              # Main application routes
@@ -251,7 +248,3 @@ chmod 755 data
 ## License
 
 MIT License - See LICENSE file for details
-
-## Support
-
-For support, email support@macrohard.local or open an issue on GitHub.

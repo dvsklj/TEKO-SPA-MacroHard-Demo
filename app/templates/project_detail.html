@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - MacroHard{% endblock %}
+
+{% block content %}
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">MacroHard</a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-menu" onclick="window.location.href='/auth/logout'">
+                <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
+                <div class="user-info">
+                    <div class="user-name">{{ current_user.username }}</div>
+                    <div class="user-email">{{ current_user.email }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'error' if category == 'error' else 'success' if category == 'success' else 'info' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/dashboard">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">{{ project.name }}</span>
+        </div>
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>{{ project.name }}</h1>
+                <div style="font-size: 14px; color: var(--text-muted);">{{ project.repo_url or 'No repository linked' }}</div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <form method="POST" action="/project/{{ project.id }}/analyze" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Run Analysis
+                    </button>
+                </form>
+                <a href="/project/{{ project.id }}/export" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Critical</span>
+                    <span class="stat-indicator critical"></span>
+                </div>
+                <div class="stat-value critical">{{ project.critical_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">High</span>
+                    <span class="stat-indicator high"></span>
+                </div>
+                <div class="stat-value high">{{ project.high_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Medium</span>
+                    <span class="stat-indicator medium"></span>
+                </div>
+                <div class="stat-value medium">{{ project.medium_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Low</span>
+                    <span class="stat-indicator low"></span>
+                </div>
+                <div class="stat-value low">{{ project.low_count }}</div>
+            </div>
+        </div>
+
+        <!-- Vulnerabilities Table -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Vulnerabilities</span>
+                <span class="card-meta">{{ vulnerabilities|length }} issues found</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Severity</th>
+                            <th>Title</th>
+                            <th>File</th>
+                            <th>Line</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vuln in vulnerabilities %}
+                        <tr>
+                            <td>
+                                <span class="severity-tag {{ vuln.severity }}">
+                                    <span class="severity-dot {{ vuln.severity }}"></span>
+                                    {{ vuln.severity|title }}
+                                </span>
+                            </td>
+                            <td style="font-weight: 500;">{{ vuln.title }}</td>
+                            <td><code>{{ vuln.file_path or '-' }}</code></td>
+                            <td style="color: var(--text-muted);">{{ vuln.line_number or '-' }}</td>
+                            <td>
+                                <span class="status-badge">
+                                    <span class="status-dot"></span>
+                                    {{ vuln.status|replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td style="color: var(--text-muted);">{{ vuln.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <form method="POST" action="/vulnerability/{{ vuln.id }}/update" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <select name="status" onchange="this.form.submit()" style="padding: 4px 8px; font-size: 13px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-elevated);">
+                                        <option value="open" {% if vuln.status == 'open' %}selected{% endif %}>Open</option>
+                                        <option value="resolved" {% if vuln.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                        <option value="false_positive" {% if vuln.status == 'false_positive' %}selected{% endif %}>False Positive</option>
+                                        <option value="ignored" {% if vuln.status == 'ignored' %}selected{% endif %}>Ignored</option>
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                No vulnerabilities found. Run an analysis to scan for issues.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

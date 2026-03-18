@@ -1,0 +1,42 @@
+# MacroHard - Security Analysis Platform
+# Docker Compose Configuration
+
+version: '3.8'
+
+services:
+  macrohard:
+    build: .
+    container_name: macrohard-app
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change-this-in-production-generate-a-secure-key-min-64-chars}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-generate-a-32-byte-key-for-fernet-encryption}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///data/macrohard.db}
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - DEMO_MODE=${DEMO_MODE:-false}
+    volumes:
+      - ./data:/app/data
+      - /tmp/macrohard:/tmp/macrohard
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Redis for distributed rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: macrohard-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    profiles:
+      - with-redis
+
+volumes:
+  redis_data:

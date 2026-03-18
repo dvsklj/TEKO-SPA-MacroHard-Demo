@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MacroHard - We harden your stack on a macro level">
     <title>MacroHard - Security Analysis Platform</title>
     <style>
         :root {
             --bg: #fafafa;
             --bg-elevated: #ffffff;
+            --bg-soft: #f5f5f5;
             --text: #171717;
             --text-secondary: #525252;
             --text-muted: #737373;
@@ -19,6 +21,7 @@
             --high: #ea580c;
             --medium: #ca8a04;
             --low: #16a34a;
+            --info: #2563eb;
             --radius: 8px;
             --radius-lg: 12px;
         }
@@ -36,16 +39,20 @@
         nav {
             border-bottom: 1px solid var(--border);
             background: var(--bg-elevated);
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
 
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
-            height: 64px;
+            min-height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 16px;
         }
 
         .logo {
@@ -63,7 +70,7 @@
         }
 
         .nav-link {
-            padding: 8px 16px;
+            padding: 8px 14px;
             font-size: 14px;
             font-weight: 500;
             color: var(--text-secondary);
@@ -81,7 +88,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px;
+            padding: 10px 18px;
             font-size: 14px;
             font-weight: 500;
             border-radius: var(--radius);
@@ -106,11 +113,18 @@
 
         .btn-secondary:hover { background: var(--bg); }
 
-        .hero {
-            padding: 120px 24px;
-            text-align: center;
-            max-width: 800px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            padding: 84px 0 48px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+            align-items: center;
         }
 
         .hero h1 {
@@ -118,29 +132,44 @@
             font-weight: 700;
             letter-spacing: -0.03em;
             line-height: 1.1;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
-        .hero p {
+        .hero .subtitle {
             font-size: 20px;
             color: var(--text-secondary);
-            margin-bottom: 40px;
+            margin-bottom: 22px;
             line-height: 1.6;
+        }
+
+        .hero .tagline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 12px;
+            background: var(--bg-elevated);
         }
 
         .hero-actions {
             display: flex;
             gap: 12px;
-            justify-content: center;
+            margin-bottom: 16px;
         }
 
-        .preview-section {
-            padding: 0 24px 80px;
+        .hero-meta {
+            font-size: 13px;
+            color: var(--text-muted);
         }
 
-        .preview-card {
-            max-width: 900px;
-            margin: 0 auto;
+        .hero-preview {
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
@@ -149,16 +178,22 @@
         }
 
         .preview-header {
-            padding: 16px 20px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .preview-dots {
+            display: inline-flex;
+            gap: 7px;
+            align-items: center;
         }
 
         .dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
         }
 
@@ -166,21 +201,39 @@
         .dot-orange { background: var(--high); }
         .dot-green { background: var(--low); }
 
-        .preview-content { padding: 24px; }
+        .preview-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .preview-content {
+            padding: 18px;
+            display: grid;
+            gap: 14px;
+        }
 
         .stat-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
         }
 
-        .stat-item { text-align: center; }
+        .stat {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            background: var(--bg);
+        }
 
         .stat-value {
-            font-size: 36px;
+            font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 4px;
+            line-height: 1;
+            margin-bottom: 6px;
         }
 
         .stat-value.critical { color: var(--critical); }
@@ -189,22 +242,61 @@
         .stat-value.low { color: var(--low); }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .features {
-            padding: 80px 24px;
-            background: var(--bg-elevated);
+        .mini-feed {
             border-top: 1px solid var(--border);
+            padding-top: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
-        .features-container {
-            max-width: 1000px;
-            margin: 0 auto;
+        .mini-feed ul {
+            list-style: none;
+            display: grid;
+            gap: 8px;
+        }
+
+        .mini-feed li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+            padding: 3px 8px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border: 1px solid transparent;
+        }
+
+        .badge.info {
+            color: #1d4ed8;
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .badge.critical {
+            color: #b91c1c;
+            background: rgba(220, 38, 38, 0.1);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .section {
+            padding: 22px 0 58px;
         }
 
         .section-title {
@@ -213,66 +305,207 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            margin-bottom: 40px;
-            text-align: center;
+            margin-bottom: 16px;
         }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+        .section-headline {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
         }
 
-        .feature { text-align: center; }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feature-icon svg {
-            width: 24px;
-            height: 24px;
+        .section-copy {
             color: var(--text-secondary);
+            margin-bottom: 26px;
+            max-width: 860px;
         }
 
-        .feature h3 {
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid.two {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+        }
+
+        .card h3 {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
-        .feature p {
+        .card p {
             font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.6;
         }
 
-        footer {
-            padding: 40px 24px;
-            text-align: center;
-            border-top: 1px solid var(--border);
-        }
-
-        footer p {
-            font-size: 13px;
+        .card .meta {
+            font-size: 12px;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        @media (max-width: 768px) {
+        .timeline {
+            display: grid;
+            gap: 12px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 132px 1fr;
+            gap: 14px;
+            align-items: start;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+        }
+
+        .timeline-domain {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 4px 10px;
+            display: inline-flex;
+            justify-content: center;
+            background: var(--bg-soft);
+        }
+
+        .timeline-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .kpi {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            background: var(--bg-elevated);
+        }
+
+        .kpi .value {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .kpi .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .cta {
+            margin: 22px 0 62px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: var(--bg-elevated);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .cta h3 {
+            font-size: 24px;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .cta p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 24px 40px;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 64px;
+            }
+
+            .grid.three {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+            }
+
+            .cta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
             .hero h1 { font-size: 36px; }
-            .hero p { font-size: 18px; }
-            .stat-row { grid-template-columns: repeat(2, 1fr); }
-            .feature-grid { grid-template-columns: 1fr; }
+            .hero .subtitle { font-size: 18px; }
             .hero-actions { flex-direction: column; }
             .hero-actions .btn { width: 100%; }
+            .stat-row,
+            .grid.two,
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -287,85 +520,166 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <h1>Security analysis for modern teams</h1>
-        <p>Identify vulnerabilities, track security issues, and protect your applications with enterprise-grade analysis tools.</p>
-        <div class="hero-actions">
-            <a href="/auth/register" class="btn btn-primary">Start free trial</a>
-            <a href="/auth/login" class="btn btn-secondary">Sign in</a>
-        </div>
-    </section>
+    <main class="container">
+        <section class="hero">
+            <div>
+                <span class="tagline">Security Engineering Platform</span>
+                <h1>We harden your stack on a macro level</h1>
+                <p class="subtitle">MacroHard combines secure self-signup, automated vulnerability analysis, update generation, and subscription workflows in one platform.</p>
+                <div class="hero-actions">
+                    <a href="/auth/register" class="btn btn-primary">Start free trial</a>
+                    <a href="/auth/login" class="btn btn-secondary">Open demo account</a>
+                </div>
+                <p class="hero-meta">Purpose: Hardening of software development projects across marketing, engineering, and finance.</p>
+            </div>
 
-    <section class="preview-section">
-        <div class="preview-card">
-            <div class="preview-header">
-                <span class="dot dot-red"></span>
-                <span class="dot dot-orange"></span>
-                <span class="dot dot-green"></span>
-            </div>
-            <div class="preview-content">
-                <div class="stat-row">
-                    <div class="stat-item">
-                        <div class="stat-value critical">2</div>
-                        <div class="stat-label">Critical</div>
+            <div class="hero-preview" aria-label="Demo security preview">
+                <div class="preview-header">
+                    <div class="preview-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-orange"></span>
+                        <span class="dot dot-green"></span>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value high">3</div>
-                        <div class="stat-label">High</div>
+                    <span class="preview-title">Current Vulnerability Overview</span>
+                </div>
+                <div class="preview-content">
+                    <div class="stat-row">
+                        <div class="stat">
+                            <div class="stat-value critical">2</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value high">3</div>
+                            <div class="stat-label">High</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value medium">5</div>
+                            <div class="stat-label">Medium</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value low">1</div>
+                            <div class="stat-label">Low</div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value medium">5</div>
-                        <div class="stat-label">Medium</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value low">1</div>
-                        <div class="stat-label">Low</div>
+                    <div class="mini-feed">
+                        <ul>
+                            <li><span>Initial analysis SLA</span><span class="badge info">&le; 5 min</span></li>
+                            <li><span>UI response objective</span><span class="badge info">&le; 2 sec</span></li>
+                            <li><span>Open critical findings</span><span class="badge critical">2 open</span></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="features">
-        <div class="features-container">
-            <h2 class="section-title">Features</h2>
-            <div class="feature-grid">
-                <div class="feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
+        <section class="section">
+            <p class="section-title">Macro Workflow</p>
+            <h2 class="section-headline">From acquisition to secure updates</h2>
+            <p class="section-copy">The platform models end-to-end business flow: marketing preparation, user self-registration, automatic code analysis, update generation and delivery, plus subscription accounting.</p>
+
+            <div class="timeline">
+                <article class="timeline-item">
+                    <span class="timeline-domain">Marketing</span>
+                    <div class="timeline-content">
+                        <h4>Product Communication</h4>
+                        <p>Create and manage media assets (text, images, videos) and support product rollout campaigns.</p>
                     </div>
-                    <h3>Encrypted at Rest</h3>
-                    <p>All vulnerability data is encrypted using AES-256, ensuring sensitive information stays protected.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                        </svg>
+                </article>
+                <article class="timeline-item">
+                    <span class="timeline-domain">Engineering</span>
+                    <div class="timeline-content">
+                        <h4>Self-Signup and Access</h4>
+                        <p>Users can register independently with secure authentication and registration quality targets.</p>
                     </div>
-                    <h3>Instant Analysis</h3>
-                    <p>Run security scans with a single click. Get real-time results and actionable insights.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
+                </article>
+                <article class="timeline-item">
+                    <span class="timeline-domain">Engineering</span>
+                    <div class="timeline-content">
+                        <h4>Automated Analysis</h4>
+                        <p>Analyze customer repositories, detect vulnerabilities, and prioritize findings by severity.</p>
                     </div>
-                    <h3>Export Anywhere</h3>
-                    <p>Export findings to CSV format compatible with any spreadsheet application.</p>
-                </div>
+                </article>
+                <article class="timeline-item">
+                    <span class="timeline-domain">Engineering</span>
+                    <div class="timeline-content">
+                        <h4>Update Generation</h4>
+                        <p>Generate update code as merge requests or pull requests and streamline secure deployment paths.</p>
+                    </div>
+                </article>
+                <article class="timeline-item">
+                    <span class="timeline-domain">Finance</span>
+                    <div class="timeline-content">
+                        <h4>Subscription Billing</h4>
+                        <p>Process and record recurring subscription costs with auditable financial handling.</p>
+                    </div>
+                </article>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section class="section">
+            <h2 class="section-headline">Platform capabilities in one demo</h2>
+            <p class="section-copy">The demo connects product workflow, engineering automation, and security visibility for stakeholders.</p>
+
+            <div class="grid two">
+                <article class="card">
+                    <p class="meta">Product</p>
+                    <h3>Availability and Usability</h3>
+                    <p>Keep registration friction low and maintain clear visibility into critical vulnerabilities.</p>
+                </article>
+                <article class="card">
+                    <p class="meta">Engineering</p>
+                    <h3>Controlled Updates and Fast Analysis</h3>
+                    <p>Ship updates through version control workflows and keep analysis cycles short.</p>
+                </article>
+                <article class="card">
+                    <p class="meta">Security</p>
+                    <h3>Secure Data Storage</h3>
+                    <p>Store internal data with encryption at rest and limited external dependency.</p>
+                </article>
+                <article class="card">
+                    <p class="meta">Operations</p>
+                    <h3>Data Portability</h3>
+                    <p>Provide customer-owned exports in readable formats such as CSV.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <p class="section-title">Quality Targets</p>
+            <div class="kpi-grid">
+                <article class="kpi">
+                    <div class="value">99.9%</div>
+                    <div class="label">Registration success target</div>
+                </article>
+                <article class="kpi">
+                    <div class="value">&le; 5m</div>
+                    <div class="label">Initial analysis window</div>
+                </article>
+                <article class="kpi">
+                    <div class="value">&le; 2s</div>
+                    <div class="label">Interaction response goal</div>
+                </article>
+                <article class="kpi">
+                    <div class="value">99.91%</div>
+                    <div class="label">Yearly availability objective</div>
+                </article>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div>
+                <h3>Run the demo with realistic security data</h3>
+                <p>Sign in with the seeded demo account and inspect findings, export CSV reports, and project-level analysis timelines.</p>
+            </div>
+            <a href="/auth/register" class="btn btn-primary">Create account</a>
+        </section>
+    </main>
 
     <footer>
-        <p>MacroHard Security Platform &copy; 2025</p>
+        <div class="footer-inner">
+            <span>MacroHard Security Platform &copy; 2026</span>
+            <span>Availability, Usability, Maintainability, Performance, Security</span>
+        </div>
     </footer>
 </body>
 </html>

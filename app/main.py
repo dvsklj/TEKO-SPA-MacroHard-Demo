@@ -20,37 +20,101 @@ def index():
     return render_template('index.html')
 
 
-@bp.route('/dashboard')
-@login_required
-def dashboard():
-    """Main dashboard with security overview"""
+def _dashboard_context():
+    """Shared dashboard data used across feature screens"""
     projects = current_user.projects.filter_by(is_active=True).all()
-    
+
     # Aggregate stats across all projects
     total_critical = sum(p.critical_count for p in projects)
     total_high = sum(p.high_count for p in projects)
     total_medium = sum(p.medium_count for p in projects)
     total_low = sum(p.low_count for p in projects)
-    
+
     # Recent vulnerabilities
     recent_vulns = Vulnerability.query.join(Project).filter(
         Project.user_id == current_user.id,
         Vulnerability.status == 'open'
     ).order_by(Vulnerability.created_at.desc()).limit(10).all()
-    
+
     # Recent analyses
     recent_analyses = Analysis.query.join(Project).filter(
         Project.user_id == current_user.id
     ).order_by(Analysis.started_at.desc()).limit(5).all()
-    
-    return render_template('dashboard.html',
-                         projects=projects,
-                         total_critical=total_critical,
-                         total_high=total_high,
-                         total_medium=total_medium,
-                         total_low=total_low,
-                         recent_vulns=recent_vulns,
-                         recent_analyses=recent_analyses)
+
+    total_open = total_critical + total_high + total_medium + total_low
+    uptime_target_percent = round((1 - (8 / (365 * 24))) * 100, 2)  # max 8h downtime/year
+
+    demo_kpis = {
+        'registration_success_rate': 99.9,
+        'analysis_window_minutes': 5,
+        'reaction_time_seconds': 2,
+        'uptime_target_percent': uptime_target_percent,
+        'total_open_findings': total_open
+    }
+
+    workflow_steps = [
+        {'domain': 'Marketing', 'title': 'Product Positioning', 'detail': 'Prepare go-to-market messaging and channel assets.'},
+        {'domain': 'Software Engineering', 'title': 'Self-Signup', 'detail': 'Enable low-friction user onboarding with secure defaults.'},
+        {'domain': 'Software Engineering', 'title': 'Automated Analysis', 'detail': 'Continuously scan customer repositories for vulnerabilities.'},
+        {'domain': 'Software Engineering', 'title': 'Update Generation', 'detail': 'Generate patch proposals via merge/pull requests.'},
+        {'domain': 'Finance', 'title': 'Subscription Billing', 'detail': 'Book and reconcile recurring subscription costs.'}
+    ]
+
+    quality_requirements = [
+        {'attribute': 'Availability', 'scenario': 'Only 1 out of 1,000 registration attempts should require hotline support.', 'enabler': 'CI quality gates and distributed infrastructure.'},
+        {'attribute': 'Usability', 'scenario': 'Users can quickly identify currently critical vulnerabilities.', 'enabler': 'Clear UI hierarchy, VCS integration, and actionable summaries.'},
+        {'attribute': 'Maintainability', 'scenario': 'New functions are introduced only via updates.', 'enabler': 'Modular architecture and updated technical documentation.'},
+        {'attribute': 'Performance', 'scenario': 'Initial analysis of code changes completes within 5 minutes.', 'enabler': 'Defined analysis stages and adequate compute resources.'},
+        {'attribute': 'Security', 'scenario': 'All data is stored securely according to current standards.', 'enabler': 'Encryption at rest and reduced third-party dependency footprint.'}
+    ]
+
+    return {
+        'projects': projects,
+        'total_critical': total_critical,
+        'total_high': total_high,
+        'total_medium': total_medium,
+        'total_low': total_low,
+        'recent_vulns': recent_vulns,
+        'recent_analyses': recent_analyses,
+        'demo_kpis': demo_kpis,
+        'workflow_steps': workflow_steps,
+        'quality_requirements': quality_requirements
+    }
+
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    """Overview dashboard screen"""
+    return render_template('dashboard.html', active_section='overview', **_dashboard_context())
+
+
+@bp.route('/dashboard/projects')
+@login_required
+def dashboard_projects():
+    """Projects dashboard screen"""
+    return render_template('dashboard_projects.html', active_section='projects', **_dashboard_context())
+
+
+@bp.route('/dashboard/findings')
+@login_required
+def dashboard_findings():
+    """Findings dashboard screen"""
+    return render_template('dashboard_findings.html', active_section='findings', **_dashboard_context())
+
+
+@bp.route('/dashboard/insights')
+@login_required
+def dashboard_insights():
+    """Insights dashboard screen"""
+    return render_template('dashboard_requirements.html', active_section='insights', **_dashboard_context())
+
+
+@bp.route('/dashboard/requirements')
+@login_required
+def dashboard_requirements_redirect():
+    """Backward-compatible route to insights dashboard"""
+    return redirect(url_for('main.dashboard_insights'))
 
 
 @bp.route('/projects/new', methods=['POST'])
@@ -108,7 +172,8 @@ def project_detail(project_id):
     return render_template('project_detail.html',
                          project=project,
                          vulnerabilities=vulnerabilities,
-                         analyses=analyses)
+                         analyses=analyses,
+                         active_section='projects')
 
 
 @bp.route('/project/<int:project_id>/analyze', methods=['POST'])

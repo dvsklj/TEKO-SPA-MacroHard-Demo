@@ -4,34 +4,57 @@
 
 {% block content %}
 <div class="app">
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-logo">MacroHard</a>
         </div>
         <nav class="sidebar-nav">
-            <a href="/dashboard" class="nav-item active">
+            <div class="sidebar-section-title">Navigation</div>
+            <a href="/dashboard" class="nav-item {{ 'active' if active_section == 'overview' else '' }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                 </svg>
-                Dashboard
+                Overview
+            </a>
+            <a href="/dashboard/projects" class="nav-item {{ 'active' if active_section == 'projects' else '' }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7h18"></path>
+                    <path d="M3 12h18"></path>
+                    <path d="M3 17h18"></path>
+                </svg>
+                Projects
+            </a>
+            <a href="/dashboard/findings" class="nav-item {{ 'active' if active_section == 'findings' else '' }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Findings
             </a>
         </nav>
         <div class="sidebar-footer">
-            <div class="user-menu" onclick="window.location.href='/auth/logout'">
-                <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
-                <div class="user-info">
-                    <div class="user-name">{{ current_user.username }}</div>
-                    <div class="user-email">{{ current_user.email }}</div>
+            <div class="user-menu-wrap" id="userMenuWrap">
+                <button type="button" class="user-menu" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ current_user.username }}</div>
+                        <div class="user-email">{{ current_user.email }}</div>
+                    </div>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/dashboard" class="dropdown-item">Open dashboard</a>
+                    <form method="POST" action="/auth/logout">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="dropdown-item logout">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -41,9 +64,8 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="/dashboard">Dashboard</a>
+            <a href="/dashboard/projects">Projects</a>
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-current">{{ project.name }}</span>
         </div>
@@ -74,8 +96,7 @@
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-grid">
+        <div class="stats-grid" id="project-overview">
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Critical</span>
@@ -106,8 +127,7 @@
             </div>
         </div>
 
-        <!-- Vulnerabilities Table -->
-        <div class="card">
+        <div class="card" id="findings-section">
             <div class="card-header">
                 <span class="card-title">Vulnerabilities</span>
                 <span class="card-meta">{{ vulnerabilities|length }} issues found</span>
@@ -169,4 +189,25 @@
         </div>
     </main>
 </div>
+
+<script>
+    function toggleUserMenu(event) {
+        event.stopPropagation();
+        document.getElementById('userMenuWrap').classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('userMenuWrap');
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.remove('open');
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const menu = document.getElementById('userMenuWrap');
+            if (menu) menu.classList.remove('open');
+        }
+    });
+</script>
 {% endblock %}

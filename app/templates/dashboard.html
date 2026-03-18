@@ -4,34 +4,57 @@
 
 {% block content %}
 <div class="app">
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-logo">MacroHard</a>
         </div>
         <nav class="sidebar-nav">
-            <a href="/dashboard" class="nav-item active">
+            <div class="sidebar-section-title">Navigation</div>
+            <a href="/dashboard" class="nav-item {{ 'active' if active_section == 'overview' else '' }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                 </svg>
-                Dashboard
+                Overview
+            </a>
+            <a href="/dashboard/projects" class="nav-item {{ 'active' if active_section == 'projects' else '' }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7h18"></path>
+                    <path d="M3 12h18"></path>
+                    <path d="M3 17h18"></path>
+                </svg>
+                Projects
+            </a>
+            <a href="/dashboard/findings" class="nav-item {{ 'active' if active_section == 'findings' else '' }}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Findings
             </a>
         </nav>
         <div class="sidebar-footer">
-            <div class="user-menu" onclick="window.location.href='/auth/logout'">
-                <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
-                <div class="user-info">
-                    <div class="user-name">{{ current_user.username }}</div>
-                    <div class="user-email">{{ current_user.email }}</div>
+            <div class="user-menu-wrap" id="userMenuWrap">
+                <button type="button" class="user-menu" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ current_user.username }}</div>
+                        <div class="user-email">{{ current_user.email }}</div>
+                    </div>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/dashboard" class="dropdown-item" style="display:block; text-decoration:none;">Open dashboard</a>
+                    <form method="POST" action="/auth/logout">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="dropdown-item logout">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -44,7 +67,7 @@
         <div class="page-header">
             <div class="page-title">
                 <h1>Security Overview</h1>
-                <p>Real-time vulnerability assessment across all projects</p>
+                <p>Concise visibility into current risk posture and next actions.</p>
             </div>
             <button class="btn btn-primary" onclick="openModal()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -55,8 +78,7 @@
             </button>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-grid">
+        <div class="stats-grid" style="margin-bottom: 24px;">
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Critical</span>
@@ -87,74 +109,93 @@
             </div>
         </div>
 
-        <div class="content-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-            <!-- Projects -->
+        <div class="content-grid" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; margin-bottom: 24px;">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">Projects</span>
-                    <span class="card-meta">{{ projects|length }} total</span>
+                    <span class="card-title">Overview Summary</span>
+                    <span class="card-meta">Current account snapshot</span>
                 </div>
                 <div class="card-body">
-                    {% for project in projects %}
-                    <a href="/project/{{ project.id }}" class="project-item">
-                        <div class="project-info">
-                            <h4>{{ project.name }}</h4>
-                            <p>{{ project.repo_url or 'No repository linked' }}</p>
-                        </div>
-                        <div class="project-badges">
-                            {% if project.critical_count > 0 %}
-                            <span class="badge critical">{{ project.critical_count }}</span>
-                            {% endif %}
-                            {% if project.high_count > 0 %}
-                            <span class="badge high">{{ project.high_count }}</span>
-                            {% endif %}
-                            {% if project.medium_count > 0 %}
-                            <span class="badge medium">{{ project.medium_count }}</span>
-                            {% endif %}
-                            {% if project.low_count > 0 %}
-                            <span class="badge low">{{ project.low_count }}</span>
-                            {% endif %}
-                            <span class="project-arrow">&rsaquo;</span>
-                        </div>
-                    </a>
-                    {% else %}
-                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        <p>No projects yet. Create one to get started.</p>
+                    <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">Open findings</span>
+                        <strong>{{ demo_kpis.total_open_findings }}</strong>
                     </div>
-                    {% endfor %}
+                    <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">Active projects</span>
+                        <strong>{{ projects|length }}</strong>
+                    </div>
+                    <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">Availability target</span>
+                        <strong>{{ demo_kpis.uptime_target_percent }}%</strong>
+                    </div>
+                    <div style="padding: 14px 20px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">Initial analysis window</span>
+                        <strong>≤ {{ demo_kpis.analysis_window_minutes }}m</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- Recent Findings -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">Recent Findings</span>
+                    <span class="card-title">Quick Actions</span>
+                    <span class="card-meta">Most common tasks</span>
                 </div>
-                <div class="card-body">
-                    {% for vuln in recent_vulns %}
-                    <div style="padding: 14px 20px; border-bottom: 1px solid var(--border);">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                            <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">{{ vuln.project.name }}</span>
-                            <span style="font-size: 12px; color: var(--text-muted);">{{ vuln.created_at.strftime('%b %d') }}</span>
-                        </div>
-                        <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px;">{{ vuln.title }}</div>
-                        <span class="severity-tag {{ vuln.severity }}">
-                            <span class="severity-dot {{ vuln.severity }}"></span>
-                            {{ vuln.severity|title }}
-                        </span>
+                <div class="card-body" style="padding: 16px 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="/dashboard/projects" class="btn btn-secondary" style="justify-content: center;">View Projects</a>
+                        <a href="/dashboard/findings" class="btn btn-secondary" style="justify-content: center;">Review Findings</a>
+                        {% if projects %}
+                        <a href="/project/{{ projects[0].id }}" class="btn btn-secondary" style="justify-content: center;">Open Latest Project</a>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <div style="padding: 40px; text-align: center; color: var(--text-muted);">
-                        <p>No vulnerabilities found.</p>
-                    </div>
-                    {% endfor %}
                 </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+                <span class="card-title">Recent Activity</span>
+                <span class="card-meta">Latest analyses and findings</span>
+            </div>
+            <div class="card-body table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Project</th>
+                            <th>Status / Severity</th>
+                            <th>When</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for analysis in recent_analyses %}
+                        <tr>
+                            <td>Analysis</td>
+                            <td>{{ analysis.project.name }}</td>
+                            <td>{{ analysis.status|title }}</td>
+                            <td>{{ analysis.started_at.strftime('%Y-%m-%d %H:%M') if analysis.started_at else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% for vuln in recent_vulns[:3] %}
+                        <tr>
+                            <td>Finding</td>
+                            <td>{{ vuln.project.name }}</td>
+                            <td>{{ vuln.severity|title }}</td>
+                            <td>{{ vuln.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not recent_analyses and not recent_vulns %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted);">No recent activity.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modal">
     <div class="modal">
         <div class="modal-header">
@@ -191,12 +232,28 @@
         document.getElementById('modal').classList.remove('active');
     }
 
+    function toggleUserMenu(event) {
+        event.stopPropagation();
+        document.getElementById('userMenuWrap').classList.toggle('open');
+    }
+
     document.getElementById('modal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
     });
 
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('userMenuWrap');
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.remove('open');
+        }
+    });
+
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Escape') {
+            closeModal();
+            const menu = document.getElementById('userMenuWrap');
+            if (menu) menu.classList.remove('open');
+        }
     });
 </script>
 {% endblock %}

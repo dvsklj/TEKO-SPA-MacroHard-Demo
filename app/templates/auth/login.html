@@ -8,6 +8,7 @@
         :root {
             --bg: #fafafa;
             --bg-elevated: #ffffff;
+            --bg-soft: #f5f5f5;
             --text: #171717;
             --text-secondary: #525252;
             --text-muted: #737373;
@@ -17,6 +18,7 @@
             --accent-hover: #404040;
             --critical: #dc2626;
             --radius: 8px;
+            --radius-lg: 12px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,20 +59,83 @@
 
         .auth-container {
             flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 24px;
             align-items: center;
-            justify-content: center;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
             padding: 40px 24px;
+        }
+
+        .auth-panel {
+            padding: 8px 4px;
+        }
+
+        .auth-panel h2 {
+            font-size: 30px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .auth-panel p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .auth-list {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .auth-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .auth-list li strong { color: var(--text); }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 7px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .demo-box {
+            padding: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .demo-box code {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: var(--text);
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: none;
         }
 
         .auth-card {
             width: 100%;
-            max-width: 400px;
+            padding: 8px 4px;
         }
 
         .auth-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .auth-header h1 {
@@ -84,7 +149,7 @@
             color: var(--text-secondary);
         }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
 
         .form-label {
             display: block;
@@ -112,11 +177,18 @@
 
         .form-input::placeholder { color: var(--text-muted); }
 
+        .form-error {
+            font-size: 13px;
+            color: var(--critical);
+            margin-top: 6px;
+        }
+
         .form-options {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
+            gap: 12px;
         }
 
         .checkbox-wrapper {
@@ -173,9 +245,8 @@
 
         .auth-footer {
             text-align: center;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
+            margin-top: 22px;
+            padding-top: 22px;
         }
 
         .auth-footer p {
@@ -208,7 +279,7 @@
         .alert {
             padding: 12px 16px;
             border-radius: var(--radius);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             font-size: 14px;
         }
 
@@ -224,8 +295,29 @@
             border: 1px solid rgba(22, 163, 74, 0.2);
         }
 
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        @media (max-width: 960px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-panel {
+                order: 2;
+            }
+
+            .auth-card {
+                order: 1;
+            }
+        }
+
         @media (max-width: 480px) {
             .back-link { display: none; }
+            .form-options { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -244,10 +336,23 @@
     </nav>
 
     <div class="auth-container">
+        <aside class="auth-panel">
+            <h2>Welcome to MacroHard</h2>
+            <p>Track critical vulnerabilities, review analysis cycles, and manage projects from one dashboard.</p>
+            <ul class="auth-list">
+                <li><span class="dot"></span><span><strong>Visibility:</strong> clear status across active security findings.</span></li>
+                <li><span class="dot"></span><span><strong>Speed:</strong> fast access to project analysis workflows.</span></li>
+                <li><span class="dot"></span><span><strong>Control:</strong> centralized project and findings monitoring.</span></li>
+            </ul>
+            <div class="demo-box">
+                Demo credentials: <code>demo@macrohard.local</code> / <code>demo123!</code>
+            </div>
+        </aside>
+
         <div class="auth-card">
             <div class="auth-header">
-                <h1>Welcome back</h1>
-                <p>Sign in to your account to continue</p>
+                <h1>Sign in</h1>
+                <p>Continue to your security workspace</p>
             </div>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -260,7 +365,7 @@
 
             <form method="POST" action="/auth/login">
                 {{ form.hidden_tag() }}
-                
+
                 <div class="form-group">
                     <label class="form-label">Email or username</label>
                     {{ form.email(class="form-input", placeholder="you@company.com or demo") }}
@@ -289,7 +394,7 @@
             </form>
 
             <div class="auth-footer">
-                <p>Don't have an account? <a href="/auth/register">Create one</a></p>
+                <p>Need an account? <a href="/auth/register">Create one</a></p>
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@
         :root {
             --bg: #fafafa;
             --bg-elevated: #ffffff;
+            --bg-soft: #f5f5f5;
             --text: #171717;
             --text-secondary: #525252;
             --text-muted: #737373;
@@ -17,6 +18,7 @@
             --accent-hover: #404040;
             --critical: #dc2626;
             --radius: 8px;
+            --radius-lg: 12px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,20 +59,73 @@
 
         .auth-container {
             flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 24px;
             align-items: center;
-            justify-content: center;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
             padding: 40px 24px;
+        }
+
+        .auth-panel {
+            padding: 8px 4px;
+        }
+
+        .auth-panel h2 {
+            font-size: 30px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .auth-panel p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .auth-list {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .auth-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .auth-list li strong { color: var(--text); }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 7px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .policy-box {
+            padding: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
         .auth-card {
             width: 100%;
-            max-width: 400px;
+            padding: 8px 4px;
         }
 
         .auth-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
         .auth-header h1 {
@@ -84,7 +139,7 @@
             color: var(--text-secondary);
         }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
 
         .form-label {
             display: block;
@@ -148,9 +203,8 @@
 
         .auth-footer {
             text-align: center;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
+            margin-top: 22px;
+            padding-top: 22px;
         }
 
         .auth-footer p {
@@ -180,6 +234,45 @@
 
         .back-link:hover { color: var(--text); }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: rgba(220, 38, 38, 0.1);
+            color: #b91c1c;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(22, 163, 74, 0.1);
+            color: #15803d;
+            border: 1px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        @media (max-width: 960px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-panel {
+                order: 2;
+            }
+
+            .auth-card {
+                order: 1;
+            }
+        }
+
         @media (max-width: 480px) {
             .back-link { display: none; }
         }
@@ -200,6 +293,19 @@
     </nav>
 
     <div class="auth-container">
+        <aside class="auth-panel">
+            <h2>Create secure access</h2>
+            <p>Set up your account to track vulnerabilities, run analyses, and manage secure update workflows.</p>
+            <ul class="auth-list">
+                <li><span class="dot"></span><span><strong>Usability:</strong> clear dashboard for critical findings.</span></li>
+                <li><span class="dot"></span><span><strong>Maintainability:</strong> feature growth through controlled updates.</span></li>
+                <li><span class="dot"></span><span><strong>Security:</strong> encrypted storage and hardened defaults.</span></li>
+            </ul>
+            <div class="policy-box">
+                By registering, you can export findings as CSV and evaluate demo quality targets for availability and performance.
+            </div>
+        </aside>
+
         <div class="auth-card">
             <div class="auth-header">
                 <h1>Create your account</h1>
@@ -216,7 +322,7 @@
 
             <form method="POST" action="/auth/register">
                 {{ form.hidden_tag() }}
-                
+
                 <div class="form-group">
                     <label class="form-label">Username</label>
                     {{ form.username(class="form-input", placeholder="johndoe") }}
@@ -236,7 +342,7 @@
                 <div class="form-group">
                     <label class="form-label">Password</label>
                     {{ form.password(class="form-input", placeholder="Create a password") }}
-                    <p class="form-hint">Must be at least 12 characters</p>
+                    <p class="form-hint">Use at least 12 characters for better account protection</p>
                     {% if form.password.errors %}
                         <div class="form-error">{{ form.password.errors[0] }}</div>
                     {% endif %}

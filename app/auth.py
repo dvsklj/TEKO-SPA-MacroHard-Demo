@@ -83,7 +83,7 @@ def register():
     return render_template('auth/register.html', form=form)
 
 
-@bp.route('/logout')
+@bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
     """Secure logout endpoint"""

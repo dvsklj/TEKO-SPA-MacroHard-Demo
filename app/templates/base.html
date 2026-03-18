@@ -56,14 +56,23 @@
         .sidebar-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .sidebar-logo {
-            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            font-style: italic;
             color: var(--text);
             text-decoration: none;
+            padding: 2px 8px;
         }
 
         .sidebar-nav {
@@ -101,7 +110,21 @@
             border-top: 1px solid var(--border);
         }
 
+        .sidebar-section-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            padding: 8px 16px 6px;
+        }
+
+        .user-menu-wrap {
+            position: relative;
+        }
+
         .user-menu {
+            width: 100%;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -109,10 +132,62 @@
             border-radius: var(--radius);
             cursor: pointer;
             transition: all 0.15s ease;
+            border: 1px solid transparent;
+            background: transparent;
+            text-align: left;
+            color: inherit;
+            font-family: inherit;
         }
 
-        .user-menu:hover {
+        .user-menu:hover,
+        .user-menu-wrap.open .user-menu {
             background: var(--bg);
+            border-color: var(--border);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: calc(100% + 8px);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            display: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .user-menu-wrap.open .user-dropdown {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: left;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .dropdown-item.logout {
+            color: var(--critical);
         }
 
         .user-avatar {

@@ -262,8 +262,8 @@
                 {{ form.hidden_tag() }}
                 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    {{ form.email(class="form-input", placeholder="you@company.com") }}
+                    <label class="form-label">Email or username</label>
+                    {{ form.email(class="form-input", placeholder="you@company.com or demo") }}
                     {% if form.email.errors %}
                         <div class="form-error">{{ form.email.errors[0] }}</div>
                     {% endif %}

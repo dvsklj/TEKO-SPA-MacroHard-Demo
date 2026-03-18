@@ -17,9 +17,13 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        email = form.email.data.lower().strip()
-        user = User.query.filter_by(email=email).first()
-        
+        identifier = form.email.data.strip()
+        normalized = identifier.lower()
+
+        user = User.query.filter_by(email=normalized).first()
+        if not user:
+            user = User.query.filter_by(username=identifier).first()
+
         if user and user.check_password(form.password.data):
             if not user.is_active:
                 flash('Your account has been disabled. Please contact support.', 'error')
@@ -45,7 +49,7 @@ def login():
             # Failed login
             _log_audit(user.id if user else None, 'login_failed', 
                       ip_address=request.remote_addr,
-                      details=f'Email: {email}')
+                      details=f'Identifier: {identifier}')
             flash('Invalid email or password', 'error')
     
     return render_template('auth/login.html', form=form)

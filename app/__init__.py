@@ -21,6 +21,12 @@ def create_app(config_name='default'):
     
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+
+    # Ensure the instance folder exists for the database
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
     
     # Initialize extensions
     db.init_app(app)

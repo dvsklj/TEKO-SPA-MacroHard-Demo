@@ -39,11 +39,10 @@ RUN pip install --no-cache-dir bandit==1.7.7
 # Copy application code
 COPY . .
 
-# Create data directory and set permissions
-RUN mkdir -p /app/data && chown -R macrohard:macrohard /app
-
-# Create temp directory for repository cloning
-RUN mkdir -p /tmp/macrohard && chown -R macrohard:macrohard /tmp/macrohard
+# Create data directory and temp directory and set permissions
+RUN mkdir -p /app/instance && \
+    mkdir -p /tmp/macrohard && \
+    chown -R macrohard:macrohard /app/instance /tmp/macrohard
 
 # Switch to non-root user
 USER macrohard

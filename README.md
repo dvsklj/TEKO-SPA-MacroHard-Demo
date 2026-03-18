@@ -142,7 +142,7 @@ macrohard/
 |----------|-------------|----------|---------|
 | `SECRET_KEY` | Flask secret key (64+ chars) | Yes | - |
 | `ENCRYPTION_KEY` | Fernet key for data encryption (32 bytes) | Yes | - |
-| `DATABASE_URL` | Database connection string | No | `sqlite:///data/macrohard.db` |
+| `DATABASE_URL` | Database connection string | No | `sqlite:///instance/macrohard.db` |
 | `FLASK_ENV` | Environment (development/production) | No | `production` |
 | `DEMO_MODE` | Enable demo data on startup | No | `false` |
 

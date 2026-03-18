@@ -40,6 +40,15 @@ def create_app(config_name='default'):
     login_manager.login_message = 'Please sign in to access this page.'
     login_manager.login_message_category = 'info'
     
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Flask-Login user loader callback"""
+        from app.models import User
+        try:
+            return User.query.get(int(user_id))
+        except (TypeError, ValueError):
+            return None
+    
     # Security headers middleware
     @app.after_request
     def set_security_headers(response):
@@ -89,6 +98,7 @@ def create_app(config_name='default'):
 def _create_default_admin():
     """Create default admin user if not exists"""
     from app.models import User
+    from sqlalchemy.exc import IntegrityError
     
     if not User.query.filter_by(email='admin@macrohard.local').first():
         admin = User(
@@ -99,8 +109,12 @@ def _create_default_admin():
         )
         admin.set_password('ChangeMe123!')
         db.session.add(admin)
-        db.session.commit()
-        print("[MacroHard] Default admin created: admin@macrohard.local / ChangeMe123!")
+        try:
+            db.session.commit()
+            print("[MacroHard] Default admin created: admin@macrohard.local / ChangeMe123!")
+        except IntegrityError:
+            # Multiple workers may race on first boot; ignore duplicate admin creation.
+            db.session.rollback()
 
 
 def _seed_demo_data():

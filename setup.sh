@@ -33,7 +33,7 @@ SECRET_KEY=$SECRET_KEY
 ENCRYPTION_KEY=$ENCRYPTION_KEY
 
 # Database
-DATABASE_URL=sqlite:///data/macrohard.db
+DATABASE_URL=sqlite:///instance/macrohard.db
 
 # Flask Environment
 FLASK_ENV=production

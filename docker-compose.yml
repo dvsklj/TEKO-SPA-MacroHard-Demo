@@ -12,11 +12,11 @@ services:
     environment:
       - SECRET_KEY=${SECRET_KEY:-change-this-in-production-generate-a-secure-key-min-64-chars}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-generate-a-32-byte-key-for-fernet-encryption}
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///data/macrohard.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///instance/macrohard.db}
       - FLASK_ENV=${FLASK_ENV:-production}
       - DEMO_MODE=${DEMO_MODE:-false}
     volumes:
-      - ./data:/app/data
+      - ./instance:/app/instance
       - /tmp/macrohard:/tmp/macrohard
     restart: unless-stopped
     security_opt:

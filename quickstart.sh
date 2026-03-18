@@ -46,7 +46,7 @@ case $choice in
             cat > .env <<EOF
 SECRET_KEY=$SECRET_KEY
 ENCRYPTION_KEY=$ENCRYPTION_KEY
-DATABASE_URL=sqlite:///data/macrohard.db
+DATABASE_URL=sqlite:///instance/macrohard.db
 FLASK_ENV=production
 DEMO_MODE=true
 EOF
@@ -99,7 +99,7 @@ EOF
             cat > .env <<EOF
 SECRET_KEY=$SECRET_KEY
 ENCRYPTION_KEY=$ENCRYPTION_KEY
-DATABASE_URL=sqlite:///data/macrohard.db
+DATABASE_URL=sqlite:///instance/macrohard.db
 FLASK_ENV=production
 DEMO_MODE=false
 EOF

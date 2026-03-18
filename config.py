@@ -3,6 +3,15 @@ import os
 from cryptography.fernet import Fernet
 
 
+def _normalize_database_url(raw_url: str, basedir: str) -> str:
+    """Normalize sqlite relative paths to absolute to avoid cwd-related issues."""
+    if raw_url.startswith("sqlite:///") and not raw_url.startswith("sqlite:////"):
+        rel_path = raw_url.replace("sqlite:///", "", 1)
+        abs_path = os.path.abspath(os.path.join(basedir, rel_path))
+        return f"sqlite:////{abs_path}"
+    return raw_url
+
+
 class Config:
     """Base configuration with security-focused defaults"""
     
@@ -13,8 +22,8 @@ class Config:
     
     # Database
     basedir = os.path.abspath(os.path.dirname(__file__))
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'instance', 'app.db')
+    raw_db_url = os.environ.get('DATABASE_URL') or 'sqlite:///instance/macrohard.db'
+    SQLALCHEMY_DATABASE_URI = _normalize_database_url(raw_db_url, basedir)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Security - Encryption at Rest

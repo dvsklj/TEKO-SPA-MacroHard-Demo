@@ -121,9 +121,10 @@
 
         .user-menu-wrap {
             position: relative;
+            z-index: 120;
         }
 
-        .user-menu {
+        .user-menu-wrap > summary.user-menu {
             width: 100%;
             display: flex;
             align-items: center;
@@ -137,10 +138,16 @@
             text-align: left;
             color: inherit;
             font-family: inherit;
+            list-style: none;
+        }
+
+        .user-menu-wrap > summary.user-menu::-webkit-details-marker {
+            display: none;
         }
 
         .user-menu:hover,
-        .user-menu-wrap.open .user-menu {
+        .user-menu-wrap.open .user-menu,
+        .user-menu-wrap[open] > summary.user-menu {
             background: var(--bg);
             border-color: var(--border);
         }
@@ -159,7 +166,8 @@
             z-index: 10;
         }
 
-        .user-menu-wrap.open .user-dropdown {
+        .user-menu-wrap.open .user-dropdown,
+        .user-menu-wrap[open] .user-dropdown {
             display: block;
         }
 
@@ -184,6 +192,10 @@
         .dropdown-item:hover {
             background: var(--bg);
             color: var(--text);
+        }
+
+        .user-dropdown form {
+            margin: 0;
         }
 
         .dropdown-item.logout {
@@ -240,10 +252,15 @@
             align-items: center;
             gap: 8px;
             padding: 10px 16px;
+            min-height: 40px;
             font-size: 14px;
             font-weight: 500;
+            line-height: 1.2;
+            font-family: inherit;
             border-radius: var(--radius);
-            border: none;
+            border: 1px solid transparent;
+            -webkit-appearance: none;
+            appearance: none;
             cursor: pointer;
             transition: all 0.15s ease;
             text-decoration: none;
@@ -646,7 +663,51 @@
 </head>
 <body>
     {% block content %}{% endblock %}
-    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuWraps = Array.from(document.querySelectorAll('[data-user-menu-wrap]'));
+            if (!menuWraps.length) return;
+
+            function closeAllUserMenus() {
+                menuWraps.forEach(function (wrap) {
+                    wrap.classList.remove('open');
+                    wrap.open = false;
+                    const trigger = wrap.querySelector('[data-user-menu-trigger]');
+                    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            menuWraps.forEach(function (wrap) {
+                const trigger = wrap.querySelector('[data-user-menu-trigger]');
+                if (!trigger) return;
+
+                trigger.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isOpen = wrap.open || wrap.classList.contains('open');
+                    closeAllUserMenus();
+                    if (!isOpen) {
+                        wrap.open = true;
+                        wrap.classList.add('open');
+                        trigger.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                const clickedInsideAnyMenu = menuWraps.some(function (wrap) {
+                    return wrap.contains(event.target);
+                });
+                if (!clickedInsideAnyMenu) closeAllUserMenus();
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeAllUserMenus();
+            });
+        });
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

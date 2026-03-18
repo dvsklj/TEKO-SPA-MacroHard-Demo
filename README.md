@@ -41,7 +41,7 @@ docker-compose -f docker-compose.yml up -d --build
 DEMO_MODE=true docker-compose up -d --build
 
 # Access the application
-open http://localhost:5000
+open http://localhost:5001
 ```
 
 **Demo Credentials:**
@@ -64,7 +64,7 @@ export ENCRYPTION_KEY=$(python3 -c "from cryptography.fernet import Fernet; prin
 docker-compose up -d --build
 
 # Access the application
-open http://localhost:5000
+open http://localhost:5001
 ```
 
 **Default Admin Credentials:**

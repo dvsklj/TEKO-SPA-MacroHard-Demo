@@ -8,7 +8,7 @@ services:
     build: .
     container_name: macrohard-app
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - SECRET_KEY=${SECRET_KEY:-change-this-in-production-generate-a-secure-key-min-64-chars}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-generate-a-32-byte-key-for-fernet-encryption}
@@ -22,7 +22,7 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/')"]
       interval: 30s
       timeout: 5s
       retries: 3
